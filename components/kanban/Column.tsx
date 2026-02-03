@@ -2,9 +2,10 @@
 
 import { Task, TaskState } from '../../../types/task';
 import { TaskCard } from './TaskCard';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 interface ColumnProps {
-  state: TaskState;       // 'todo' | 'doing' | 'done'
+  state: TaskState;
   tasks: Task[];
   refreshTasks?: () => void;
 }
@@ -16,9 +17,11 @@ export const Column = ({ state, tasks, refreshTasks }: ColumnProps) => {
     <div className="flex-1 bg-gray-100 p-4 rounded-md min-h-[300px]">
       <h3 className="font-bold mb-4">{title} ({tasks.length})</h3>
 
-      {tasks.map(task => (
-        <TaskCard key={task.id} task={task} refreshTasks={refreshTasks} />
-      ))}
+      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+        {tasks.map(task => (
+          <TaskCard key={task.id} task={task} refreshTasks={refreshTasks} />
+        ))}
+      </SortableContext>
 
       {tasks.length === 0 && <p className="text-gray-400">No hay tareas</p>}
     </div>

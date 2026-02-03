@@ -1,66 +1,68 @@
-// components/ui/select.tsx
 'use client';
 
 import * as React from 'react';
-import { cva } from 'class-variance-authority';
+import * as RadixSelect from '@radix-ui/react-select';
+import { cn } from '../../lib/utils';
 
-// Variantes de estilo
-const selectVariants = cva(
-  "border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full",
-  {
-    variants: {
-      variant: { default: "border-gray-300", error: "border-red-500" },
-      selectSize: { default: "h-10", sm: "h-8 text-sm px-2", lg: "h-12 text-lg px-4" },
-    },
-    defaultVariants: { variant: "default", selectSize: "default" },
-  }
-);
+// El Root del Select
+export const Select = RadixSelect.Root;
 
-type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
-  variant?: 'default' | 'error';
-  selectSize?: 'default' | 'sm' | 'lg';
-};
+// Trigger (el botón que abre el dropdown)
+export const SelectTrigger = React.forwardRef<
+  HTMLButtonElement,
+  RadixSelect.SelectTriggerProps & { className?: string }
+>(({ className, children, ...props }, ref) => (
+  <RadixSelect.Trigger
+    ref={ref}
+    className={cn(
+      'flex items-center justify-between px-3 py-2 border rounded-md bg-white text-sm',
+      'hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500',
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </RadixSelect.Trigger>
+));
+SelectTrigger.displayName = 'SelectTrigger';
 
-// Componente principal Select
-export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ variant = 'default', selectSize = 'default', className, children, ...props }, ref) => {
-    return (
-      <select
-        ref={ref}
-        className={selectVariants({ variant, selectSize, className })}
-        {...props}
-      >
-        {children}
-      </select>
-    );
-  }
-);
+// Value (muestra la opción seleccionada o placeholder)
+export const SelectValue = RadixSelect.Value;
 
-Select.displayName = 'Select';
+// Contenido del dropdown
+export const SelectContent = React.forwardRef<
+  HTMLDivElement,
+  RadixSelect.SelectContentProps & { className?: string }
+>(({ className, children, ...props }, ref) => (
+  <RadixSelect.Portal>
+    <RadixSelect.Content
+      ref={ref}
+      className={cn(
+        'bg-white border rounded-md shadow-md w-[200px] overflow-hidden',
+        className
+      )}
+      {...props}
+    >
+      <RadixSelect.Viewport>{children}</RadixSelect.Viewport>
+    </RadixSelect.Content>
+  </RadixSelect.Portal>
+));
+SelectContent.displayName = 'SelectContent';
 
-// Subcomponentes estilo Shadcn
-export const SelectTrigger = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>;
-};
-
-export const SelectContent = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>;
-};
-
-export const SelectItem = ({ children, value, ...props }: React.HTMLAttributes<HTMLDivElement> & { value: string }) => {
-  return (
-    <div role="option" data-value={value} {...props}>
-      {children}
-    </div>
-  );
-};
-
-// 🔹 Aquí está SelectValue (subcomponente, no archivo separado)
-interface SelectValueProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
-  placeholder?: string;
-}
-
-export const SelectValue: React.FC<SelectValueProps> = ({ children, placeholder, ...props }) => {
-  return <div {...props}>{children ?? placeholder}</div>;
-};
+// Cada opción
+export const SelectItem = React.forwardRef<
+  HTMLDivElement,
+  RadixSelect.SelectItemProps & { className?: string }
+>(({ children, className, ...props }, ref) => (
+  <RadixSelect.Item
+    ref={ref}
+    className={cn(
+      'px-3 py-2 cursor-pointer hover:bg-gray-200 relative select-none text-sm',
+      className
+    )}
+    {...props}
+  >
+    <RadixSelect.ItemText>{children}</RadixSelect.ItemText>
+  </RadixSelect.Item>
+));
+SelectItem.displayName = 'SelectItem';

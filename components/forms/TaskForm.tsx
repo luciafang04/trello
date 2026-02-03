@@ -1,14 +1,13 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Task, Priority } from '../../../types/task';
 import { addTask, addAuditLog } from '../../lib/storage';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,7 +30,7 @@ interface TaskFormProps {
 }
 
 export const TaskForm = ({ onCreated }: TaskFormProps) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<TaskFormData>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
   });
 
@@ -49,7 +48,6 @@ export const TaskForm = ({ onCreated }: TaskFormProps) => {
 
     addTask(newTask);
 
-    // Auditoría
     addAuditLog({
       timestamp: new Date().toISOString(),
       action: 'CREATE',
@@ -90,16 +88,23 @@ export const TaskForm = ({ onCreated }: TaskFormProps) => {
           {/* Prioridad */}
           <div>
             <label>Prioridad</label>
-            <Select {...register('priority')}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona prioridad" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              name="priority"
+              control={control}
+              render={({ field }) => (
+                <Select {...field}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona prioridad" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.priority && <p className="text-red-500 text-sm">{errors.priority.message}</p>}
           </div>
 
           {/* Tags */}

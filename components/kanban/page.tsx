@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Task, TaskState } from '../../../types/task';
 import { Column } from '../../components/kanban/Column';
 import { getTasks, updateTask } from '../../lib/storage';
@@ -10,22 +9,24 @@ import { getTasks, updateTask } from '../../lib/storage';
 export default function KanbanPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    setTasks(getTasks());
-  }, []);
+  useEffect(() => setTasks(getTasks()), []);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const oldIndex = tasks.findIndex(t => t.id === active.id);
-    const newIndex = tasks.findIndex(t => t.id === over.id);
+    const task = tasks.find(t => t.id === active.id);
+    if (!task) return;
 
-    const newTasks = arrayMove(tasks, oldIndex, newIndex);
+    // Detectamos nueva columna por el id del over
+    const newColumnState = (tasks.find(t => t.id === over.id)?.state ?? task.state) as TaskState;
+
+    const newTasks = tasks.map(t =>
+      t.id === task.id ? { ...t, state: newColumnState } : t
+    );
+
     setTasks(newTasks);
-
-    // Persistimos los cambios
-    newTasks.forEach(t => updateTask(t));
+    newTasks.forEach(updateTask);
   };
 
   const columns: Record<TaskState, Task[]> = {
@@ -38,13 +39,7 @@ export default function KanbanPage() {
     <div className="flex gap-4 p-4">
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         {(['todo','doing','done'] as TaskState[]).map(col => (
-          <SortableContext
-            key={col}
-            items={columns[col].map(t => t.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <Column state={col} tasks={columns[col]} />
-          </SortableContext>
+          <Column key={col} state={col} tasks={columns[col]} />
         ))}
       </DndContext>
     </div>
