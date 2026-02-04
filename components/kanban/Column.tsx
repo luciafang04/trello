@@ -1,6 +1,6 @@
 'use client';
 
-import { Task, TaskState } from '../../../types/task';
+import { Task, TaskState } from '../../types/task';
 import { TaskCard } from './TaskCard';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 

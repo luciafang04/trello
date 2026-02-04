@@ -3,7 +3,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Task, Priority } from '../../../types/task';
+import type { Task, Priority } from '../../types/task';
 import { addTask, addAuditLog } from '../../lib/storage';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -86,26 +86,33 @@ export const TaskForm = ({ onCreated }: TaskFormProps) => {
           </div>
 
           {/* Prioridad */}
-          <div>
-            <label>Prioridad</label>
-            <Controller
-              name="priority"
-              control={control}
-              render={({ field }) => (
-                <Select {...field}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona prioridad" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.priority && <p className="text-red-500 text-sm">{errors.priority.message}</p>}
-          </div>
+<div>
+  <label>Prioridad</label>
+  <Controller
+    name="priority"
+    control={control}
+    defaultValue="medium" // muy importante para que RHF lo inicialice
+    render={({ field }) => (
+      <Select
+        value={field.value || 'medium'} // asegura que siempre haya valor
+        onValueChange={(value) => field.onChange(value as Priority)}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Selecciona prioridad" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="low">Low</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+          <SelectItem value="high">High</SelectItem>
+        </SelectContent>
+      </Select>
+    )}
+  />
+  {errors.priority && (
+    <p className="text-red-500 text-sm">{errors.priority.message}</p>
+  )}
+</div>
+
 
           {/* Tags */}
           <div>

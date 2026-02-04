@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Task, TaskState } from '../../../types/task';
+import { Task, TaskState } from '../../types/task';
 import { getTasks } from '../../lib/storage';
 import { TaskForm } from '../forms/TaskForm';
 import { Column } from './Column';

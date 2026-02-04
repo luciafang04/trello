@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
-import { Task, TaskState } from '../../../types/task';
+import { Task, TaskState } from '../../types/task';
 import { Column } from '../../components/kanban/Column';
 import { getTasks, updateTask } from '../../lib/storage';
 
